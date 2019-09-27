@@ -1,25 +1,9 @@
-
 function el(id) {
   return document.getElementById(id);
 }
 const botton2 = el('fileUpload2')
 const canvas = new fabric.Canvas('canvas');
 
-const rect = new fabric.Rect()
-rect.width = 600
-rect.height = 200
-rect.left = 120
-rect.top = 150
-rect.hasControls = false
-rect.lockMovementX = true
-rect.lockMovementY = true
-rect.opacity = 0.1
-rect.backgroudColor =false
-
-canvas.add(rect)
-
-canvas.backgroundColor = '#c8c8c8';
-canvas.renderAll();
 botton2.onchange = function (e) {
   console.log(e)
   var reader = new FileReader();
@@ -36,11 +20,25 @@ botton2.onchange = function (e) {
       }).scale(0.9)
       
       canvas.centerObject(imgFabri)
+      imgFabri.set({globalCompositeOperation: 'destination-over'}); //set gCO for yellow
       canvas.add(imgFabri)
-      canvas.renderAll();
     }
   }
-  
   reader.readAsDataURL(e.target.files[0])
 };
-canvas.renderAll()
+
+var red = new fabric.Rect({
+  top: 150,
+  left: 120,
+  width: 600,
+  height: 200,
+  strokeDashArray: [5, 5],
+  stroke: 'black',
+  strokeWidth: 1,
+  fill: 'transparent',
+  selectable: false,
+});
+canvas.add(red);
+
+
+
