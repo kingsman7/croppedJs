@@ -1,99 +1,96 @@
 function el(id) {
-  return document.getElementById(id);
+ return document.getElementById(id);
 }
 const canvas = new fabric.Canvas('canvas'); 
-const imgCanvas = el('canvas')
-let ctx = imgCanvas.getContext("2d");
 
-/* imgCanvas.onclick = (e) => {
-  var cRect = canvas.getBoundingClientRect();
-  //
-  var canvasX = Math.round(e.clientX - cRect.left); //
-  var canvasY = Math.round(e.clientY - cRect.top);
-  //
-  ctx.clearRect(0, 0, canvas.width, canvas.height); //
-  console.log("X: "+canvasX+", Y: "+canvasY);
-}; */
 
 const botton2 = el('fileUpload2')
 const croppied = el('crop')
-let imgScr = null
-
 botton2.onchange = function (e) {
   var reader = new FileReader();
   reader.onload = function (f) {
     let imObj = new Image()
     imObj.src = f.target.result;
     imObj.onload = () => {
-      let imgFabri = new fabric.Image(imObj)
-      imgFabri.set({
-        angle: 0,
-        let: 0,
-        top: 0,
-      })
-      
-      canvas.centerObject(imgFabri)
-      imgFabri.set({globalCompositeOperation: 'destination-over'}); //set gCO for yellow
-      imgScr = imgFabri
-      canvas.add(imgFabri)
+      const imgFabri = new fabric.Image(imObj)
+      mainImage = imgFabri
+      mainImage.set({
+        transparentCorners: false,
+        cornerColor: 'red',
+        cornerStrokeColor: 'red',
+        borderColor: 'red',
+        cornerSize: 12,
+        padding: 10,
+        cornerStyle: 'circle',
+        borderDashArray: [3, 3]
+      });
+      canvas.centerObject(mainImage)
+      mainImage.set({globalCompositeOperation: 'destination-over'});
+      canvas.add(mainImage)
     }
   }
   reader.readAsDataURL(e.target.files[0])
 };
-
-var red = new fabric.Rect({
-  top: 150,
-  left: 120,
-  width: 600,
+ 
+var clipPath = new fabric.Rect({
+  width: 400,
   height: 200,
-  strokeDashArray: [5, 5],
-  stroke: '#00ff00',
-  strokeWidth: 1,
-  fill: 'transparent',
+  fill:'transparent',
+  opacity: 1,
+  strokeWidth:1,
+  stroke:'red',
   selectable: false,
-  hasControls : false,
   lockMovementX : true,
   lockMovementY : true
-});
-canvas.add(red);
+}); 
+
+//let img = document.createElement('img')
+//img.src = 'hotel.jpg'
+
+canvas.centerObject(clipPath)
+canvas.add(clipPath)
 
 croppied.onclick =  function () {
-  if (canvas.getActiveObject()){
+  //if (canvas.getActiveObject()){
+     let object = canvas.getActiveObject()  
+     let img = document.createElement('img')
+     img.src = object.toDataURL("image/png")
+     const xstart = clipPath.aCoords.bl.x - object.aCoords.bl.x
+     const ystart = clipPath.aCoords.tl.y - object.aCoords.tl.y
+     const width = clipPath.aCoords.br.x -clipPath.aCoords.bl.x
+     const height = clipPath.aCoords.bl.y-clipPath.aCoords.tl.y
+     const x = clipPath.left
+     const y = clipPath.top
+     //const xend = width*mainImage.scaleX
+     //const yend = height*mainImage.scaleY
+     console.log(`xstart: ${xstart}` )
+     console.log(`ystart: ${ystart}` )
+     console.log(`width: ${width}` )
+     console.log(`height: ${height}` )
+     console.log(`x: ${x}` )
+     console.log(`y: ${y}` )
+     //console.log(`xend: ${xend}` )
+     //console.log(`yend: ${yend}` )
+        
+     const ctx = canvas.getContext('2d')
+     newImg = new Image();
+     newImg.src = img.src;
+     debugger
+     
+     newImg.onload = function () {
+       ctx.drawImage(img,xstart,ystart,width,height,x,y,width,height)
+     }
+     //
     
-    object = canvas.getActiveObject()
-    
-    object.left = red.left
-    object.top = red.top
-    
-    var eLeft = red.get('left');
-    var eTop = red.get('top');
-    var left = eLeft - object.left;
-    var top = eTop - object.top;
-    
-    left *= 1;
-    top *= 1;
+    canvas.remove(mainImage)
+    //const finalImg = document.createElement('img')
+    //finalImg.src = canvasFinal.toDataURL("image/png")
+    document.body.appendChild(img) 
 
-    var eWidth = red.get('width');
-    var eHeight = red.get('height');
-    var eScaleX = red.get('scaleX');
-    var eScaleY = red.get('scaleY');
-    var width = eWidth * 1;
-    var height = eHeight * 1;
-    console.log(-(eWidth / 2) + left)
-    console.log(-(eHeight / 2) + top)
-    
-      object.clipTo = (ctx)=>{
-        ctx.rect(-(eWidth / 2) + left, -(eHeight / 2) + top, parseInt(width * eScaleX), parseInt(eScaleY * height));
-      }
-      
-      //canvas.remove(red)
-      canvas.renderAll()
-    let note = document.createElement("img")
-    note.setAttribute('src', imgScr.toDataURL('image/jpg'))
-    imagendel = note.getAttribute('src')
-    document.body.insertBefore(note, botton2)
-  }else{
-    alert('seleccione la imagen')
-  }
+ // }else{
+ //   alert('seleccione la imagen')
+ //}
 };
+
+
 
